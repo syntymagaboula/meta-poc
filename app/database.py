@@ -150,42 +150,50 @@ def save_message(
 ):
 
     if not message:
-        return
+        return False
 
     if message_exists(
         conversation_id,
         message
     ):
-        return
+        return False
 
-    conn = get_connection()
-    cur = conn.cursor()
+    try:
 
-    cur.execute("""
-    INSERT INTO messages(
-        conversation_id,
-        sender_name,
-        role,
-        message,
-        timestamp,
-        msg_index
-    )
-    VALUES (?, ?, ?, ?, ?, ?)
-    """, (
-        conversation_id,
-        sender_name,
-        role,
-        message,
-        timestamp,
-        msg_index
-    ))
-    conn.commit()
-    conn.close()
+        conn = get_connection()
+        cur = conn.cursor()
 
+        cur.execute("""
+        INSERT INTO messages(
+            conversation_id,
+            sender_name,
+            role,
+            message,
+            timestamp,
+            msg_index
+        )
+        VALUES (?, ?, ?, ?, ?, ?)
+        """, (
+            conversation_id,
+            sender_name,
+            role,
+            message,
+            timestamp,
+            msg_index
+        ))
 
-# ==========================
-# GET CONVERSATION
-# ==========================
+        conn.commit()
+
+        return True
+
+    except Exception as e:
+
+        print("ERREUR SAVE_MESSAGE:", str(e))
+        return False
+
+    finally:
+
+        conn.close()
 
 def get_messages(
     conversation_id

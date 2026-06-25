@@ -58,7 +58,7 @@ def clean_message(text: str):
             return ""
 
     text = re.sub(
-        r"Aujourd’hui\s*\d{1,2}:\d{2}",
+        r"Aujourd'hui\s*\d{1,2}:\d{2}",
         "",
         text
     )
@@ -132,6 +132,7 @@ def parse_timestamp(value):
         ).isoformat()
     except Exception:
         return datetime.utcnow().isoformat()
+
 # ======================
 # NORMALIZATION
 # ======================
@@ -249,8 +250,8 @@ async def webhook(request: Request):
             (msg.get("text") or msg.get("message") or "")[:120]
         )
     print(
-            parse_timestamp(msg.get("timestamp"))
-        )
+        parse_timestamp(msg.get("timestamp"))
+    )
     print("==========================\n")
 
     fallback = (
@@ -293,9 +294,17 @@ async def webhook(request: Request):
 
         seen.add(key)
 
-        save_message(**norm)
+        inserted = save_message(**norm)
 
-        saved += 1
+        if inserted:
+            saved += 1
+
+        print(
+            "INSERTION",
+            inserted,
+            "|",
+            norm["message"][:80]
+        )
 
     update_conversation(
         conversation_id
